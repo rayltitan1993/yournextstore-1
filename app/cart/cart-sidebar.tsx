@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { ShoppingBag } from "lucide-react";
+import { toast } from "sonner";
 import Link from "next/link";
 import { Button } from "../../src/components/ui/button";
 import { ScrollArea } from "../../src/components/ui/scroll-area";
@@ -15,7 +17,28 @@ const locale = "en-US";
 export function CartSidebar() {
 	const { isOpen, closeCart, items, itemCount, subtotal, cartId } = useCart();
 
-	const checkoutUrl = cartId ? `${process.env.NEXT_PUBLIC_YNS_API_TENANT}/cart/r/${cartId}` : "#";
+	const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+
+	const handleCheckout = async () => {
+		setIsCheckoutLoading(true);
+		try {
+			const response = await fetch("/api/checkout", {
+				method: "POST",
+			});
+			const data = await response.json();
+			if (!response.ok) {
+				console.error("API Error Response:", data);
+				throw new Error(data.error || "Checkout failed");
+			}
+			if (data.url) {
+				window.location.href = data.url;
+			}
+		} catch (error: any) {
+			console.error("Checkout error:", error);
+			toast.error(error.message || "An error occurred during checkout");
+			setIsCheckoutLoading(false);
+		}
+	};
 
 	return (
 		<Sheet open={isOpen} onOpenChange={(open) => !open && closeCart()}>
@@ -59,10 +82,12 @@ export function CartSidebar() {
 									<span className="font-semibold">{formatMoney({ amount: subtotal, currency, locale })}</span>
 								</div>
 								<p className="text-xs text-muted-foreground">Shipping and taxes calculated at checkout</p>
-								<Button asChild className="w-full h-12 text-base font-medium">
-									<Link href={checkoutUrl} onClick={closeCart}>
-										Checkout
-									</Link>
+								<Button 
+									className="w-full h-12 text-base font-medium" 
+									onClick={handleCheckout}
+									disabled={isCheckoutLoading}
+								>
+									{isCheckoutLoading ? "Redirecting..." : "Checkout"}
 								</Button>
 								<button
 									type="button"

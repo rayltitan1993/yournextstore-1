@@ -9,7 +9,8 @@ const nextConfig = {
 		typedEnv: true,
 	},
 	images: {
-		remotePatterns: [{ hostname: "*.blob.vercel-storage.com" }],
+		unoptimized: true,
+		remotePatterns: [{ hostname: "*.blob.vercel-storage.com" }, { hostname: "placehold.co" }],
 	},
 };
 

@@ -9,6 +9,8 @@ import { CartSidebar } from "./cart/cart-sidebar";
 import { CartButton } from "./cart-button";
 import { Footer } from "./footer";
 import "./globals.css";
+import { Toaster } from "../src/components/ui/sonner";
+import { UserMenu } from "./user-menu";
 import { ShoppingCartIcon } from "lucide-react";
 
 const geistSans = Geist({
@@ -62,9 +64,14 @@ async function CartProviderWrapper({ children }: { children: React.ReactNode }) 
 							<Link href="/" className="text-xl font-bold">
 								Your Next Store
 							</Link>
-							<Suspense fallback={<CartButtonFallback />}>
-								<CartButton />
-							</Suspense>
+							<div className="flex items-center gap-4">
+								<Suspense fallback={<div className="w-8 h-8" />}>
+									<UserMenu />
+								</Suspense>
+								<Suspense fallback={<CartButtonFallback />}>
+									<CartButton />
+								</Suspense>
+							</div>
 						</div>
 					</div>
 				</header>
@@ -89,6 +96,7 @@ export default function RootLayout({
 				<Suspense>
 					<CartProviderWrapper>{children}</CartProviderWrapper>
 				</Suspense>
+				<Toaster />
 			</body>
 		</html>
 	);
